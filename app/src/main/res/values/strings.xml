@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">What I Know</string>
+    <string name="button_pressed">You\'ve pressed the button!</string>
+    <string name="hello_world">Hello World!</string>
 </resources>
