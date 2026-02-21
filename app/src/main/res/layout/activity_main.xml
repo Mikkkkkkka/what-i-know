@@ -59,6 +59,8 @@
         android:background="@null"
         android:ems="10"
         android:gravity="start|top"
+        android:hint="How was your day?"
+        android:importantForAutofill="no"
         android:inputType="textMultiLine"
         android:text="@string/lorem_ipsum"
         app:layout_constraintBottom_toTopOf="@+id/bottomDivider"
