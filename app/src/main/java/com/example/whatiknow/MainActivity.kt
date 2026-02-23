@@ -1,6 +1,8 @@
 package com.example.whatiknow
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -12,6 +14,7 @@ import java.time.format.DateTimeFormatter
 class MainActivity : AppCompatActivity() {
 
     var date: TextView? = null
+    var new: Button? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +29,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         date = findViewById(R.id.dateTextView)
+        new = findViewById(R.id.newButton)
+
         date?.setOnClickListener { incrementDate() }
+        new?.setOnClickListener { startNewNoteActivity() }
     }
 
     private fun openCalendar() {}
@@ -37,5 +43,10 @@ class MainActivity : AppCompatActivity() {
         val currentDate = LocalDate.parse(text, formatter)
         val newDate = currentDate.plusDays(1)
         date?.text = newDate.format(formatter)
+    }
+
+    private fun startNewNoteActivity() {
+        val intent = Intent(this, NewNoteActivity::class.java)
+        startActivity(intent)
     }
 }
