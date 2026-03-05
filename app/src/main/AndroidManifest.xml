@@ -12,7 +12,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WhatIKnow">
         <activity
-            android:name=".presentation.persistentnote.PersistentNoteActivity"
+            android:name=".presentation.workspacenote.WorkspaceNoteActivity"
             android:exported="false" />
         <activity
             android:name=".presentation.dailynote.DailyNoteActivity"

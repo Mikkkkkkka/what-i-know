@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.whatiknow.presentation.persistentnote.PersistentNoteActivity
+import com.example.whatiknow.presentation.workspacenote.WorkspaceNoteActivity
 import com.example.whatiknow.R
 import com.example.whatiknow.databinding.ActivityDailyNoteBinding
 import java.time.LocalDate
@@ -43,7 +43,7 @@ class DailyNoteActivity : AppCompatActivity() {
     }
 
     private fun startNewNoteActivity() {
-        val intent = Intent(this, PersistentNoteActivity::class.java)
+        val intent = Intent(this, WorkspaceNoteActivity::class.java)
         startActivity(intent)
     }
 }
