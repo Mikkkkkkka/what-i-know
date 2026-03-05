@@ -12,10 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WhatIKnow">
         <activity
-            android:name=".NewNoteActivity"
+            android:name=".presentation.persistentnote.PersistentNoteActivity"
             android:exported="false" />
         <activity
-            android:name=".DailyNoteActivity"
+            android:name=".presentation.dailynote.DailyNoteActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,25 +1,25 @@
-package com.example.whatiknow
+package com.example.whatiknow.presentation.dailynote
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.whatiknow.presentation.persistentnote.PersistentNoteActivity
+import com.example.whatiknow.R
+import com.example.whatiknow.databinding.ActivityDailyNoteBinding
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 class DailyNoteActivity : AppCompatActivity() {
-
-    var date: TextView? = null
-    var new: Button? = null
+    private lateinit var binding: ActivityDailyNoteBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        setContentView(R.layout.activity_daily_note)
+        binding = ActivityDailyNoteBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
@@ -28,25 +28,22 @@ class DailyNoteActivity : AppCompatActivity() {
             insets
         }
 
-        date = findViewById(R.id.dateTextView)
-        new = findViewById(R.id.newButton)
-
-        date?.setOnClickListener { incrementDate() }
-        new?.setOnClickListener { startNewNoteActivity() }
+        binding.dateTextView.setOnClickListener { incrementDate() }
+        binding.newButton.setOnClickListener { startNewNoteActivity() }
     }
 
     private fun openCalendar() {}
 
     private fun incrementDate() {
-        val text = date?.text?.toString() ?: return
+        val text = binding.dateTextView.text
         val formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
         val currentDate = LocalDate.parse(text, formatter)
         val newDate = currentDate.plusDays(1)
-        date?.text = newDate.format(formatter)
+        binding.dateTextView.text = newDate.format(formatter)
     }
 
     private fun startNewNoteActivity() {
-        val intent = Intent(this, NewNoteActivity::class.java)
+        val intent = Intent(this, PersistentNoteActivity::class.java)
         startActivity(intent)
     }
 }
