@@ -11,7 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class MainActivity : AppCompatActivity() {
+class DailyNoteActivity : AppCompatActivity() {
 
     var date: TextView? = null
     var new: Button? = null
@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_daily_note)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
