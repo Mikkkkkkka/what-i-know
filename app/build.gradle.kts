@@ -34,6 +34,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
         isCoreLibraryDesugaringEnabled = true
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
