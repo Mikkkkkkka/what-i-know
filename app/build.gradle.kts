@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.whatiknow"
+    namespace = "dev.mikkkkkkka.whatiknow"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -11,7 +11,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.whatiknow"
+        applicationId = "dev.mikkkkkkka.whatiknow"
         minSdk = 24
         targetSdk = 36
         versionCode = 1

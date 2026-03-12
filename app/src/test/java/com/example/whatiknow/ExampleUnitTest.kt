@@ -1,4 +1,4 @@
-package com.example.whatiknow
+package dev.mikkkkkkka.whatiknow
 
 import org.junit.Test
 
