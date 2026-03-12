@@ -7,7 +7,8 @@ import com.example.whatiknow.domain.repository.NoteRepository
 import java.time.LocalDateTime
 
 class LocalNoteRepository(
-    var mapper: RoomNoteEntityMapper, var noteDao: NoteDao
+    var noteDao: NoteDao,
+    var mapper: RoomNoteEntityMapper,
 ) : NoteRepository {
 
     override suspend fun getNoteIds(): List<String> {
