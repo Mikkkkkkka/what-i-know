@@ -1,4 +1,4 @@
-package com.example.whatiknow.presentation.dailynote
+package com.example.whatiknow.presentation.mark
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,19 +6,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import com.example.whatiknow.presentation.persistentnote.PersistentNoteActivity
+import com.example.whatiknow.presentation.note.NoteActivity
 import com.example.whatiknow.R
-import com.example.whatiknow.databinding.ActivityDailyNoteBinding
+import com.example.whatiknow.databinding.ActivityMarkBinding
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class DailyNoteActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityDailyNoteBinding
+class MarkActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMarkBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        binding = ActivityDailyNoteBinding.inflate(layoutInflater)
+        binding = ActivityMarkBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -43,7 +43,7 @@ class DailyNoteActivity : AppCompatActivity() {
     }
 
     private fun startNewNoteActivity() {
-        val intent = Intent(this, PersistentNoteActivity::class.java)
+        val intent = Intent(this, NoteActivity::class.java)
         startActivity(intent)
     }
 }

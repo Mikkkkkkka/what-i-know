@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".WhatIKnowApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -12,10 +13,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WhatIKnow">
         <activity
-            android:name=".presentation.persistentnote.PersistentNoteActivity"
+            android:name=".presentation.WorkspaceActivity"
             android:exported="false" />
         <activity
-            android:name=".presentation.dailynote.DailyNoteActivity"
+            android:name=".presentation.note.NoteActivity"
+            android:exported="false" />
+        <activity
+            android:name=".presentation.mark.MarkActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
