@@ -4,7 +4,11 @@ import com.example.whatiknow.domain.model.Note
 import com.example.whatiknow.domain.repository.NoteRepository
 
 class NoteRepositoryImpl : NoteRepository {
-    override suspend fun getNotes(): List<Note> {
+    override suspend fun getNoteIds(): List<String> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun getNote(): Note {
         TODO("Not yet implemented")
     }
 

@@ -1,12 +1,11 @@
 package com.example.whatiknow.domain.usecase
 
-import com.example.whatiknow.domain.model.Note
 import com.example.whatiknow.domain.repository.NoteRepository
 
-class GetNoteUseCase(
+class GetNoteIdsUseCase(
     private val repository: NoteRepository
 ) {
-    suspend operator fun invoke(): Note {
-        return repository.getNote()
+    suspend operator fun invoke(): List<String> {
+        return repository.getNoteIds()
     }
 }
