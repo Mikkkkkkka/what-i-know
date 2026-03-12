@@ -2,13 +2,14 @@ package com.example.whatiknow.data.repository
 
 import com.example.whatiknow.data.local.NoteDao
 import com.example.whatiknow.data.mapper.RoomNoteEntityMapper
+import com.example.whatiknow.di.AppModule
 import com.example.whatiknow.domain.model.Note
 import com.example.whatiknow.domain.repository.NoteRepository
 import java.time.LocalDateTime
 
 class LocalNoteRepository(
-    var noteDao: NoteDao,
-    var mapper: RoomNoteEntityMapper,
+    private val noteDao: NoteDao,
+    private val mapper: RoomNoteEntityMapper,
 ) : NoteRepository {
 
     override suspend fun getNoteIds(): List<String> {
@@ -35,5 +36,14 @@ class LocalNoteRepository(
 
     override suspend fun sync() {
         // no external sync happening
+    }
+
+    companion object {
+        fun create(appModule: AppModule): LocalNoteRepository {
+            return LocalNoteRepository(
+                appModule.noteDao,
+                appModule.roomNoteEntityMapper
+            )
+        }
     }
 }
