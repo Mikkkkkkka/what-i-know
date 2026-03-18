@@ -1,10 +1,10 @@
 package dev.mikkkkkkka.whatiknow.di
 
-import dev.mikkkkkkka.whatiknow.domain.usecase.DeleteNoteUseCase
-import dev.mikkkkkkka.whatiknow.domain.usecase.GetNoteIdsUseCase
-import dev.mikkkkkkka.whatiknow.domain.usecase.GetNoteUseCase
-import dev.mikkkkkkka.whatiknow.domain.usecase.SaveNoteUseCase
-import dev.mikkkkkkka.whatiknow.domain.usecase.SyncNoteUseCase
+import dev.mikkkkkkka.whatiknow.domain.usecase.note.DeleteNoteUseCase
+import dev.mikkkkkkka.whatiknow.domain.usecase.note.GetNoteIdsUseCase
+import dev.mikkkkkkka.whatiknow.domain.usecase.note.GetNoteUseCase
+import dev.mikkkkkkka.whatiknow.domain.usecase.note.SaveNoteUseCase
+import dev.mikkkkkkka.whatiknow.domain.usecase.note.SyncNoteUseCase
 
 interface DomainModule {
 
