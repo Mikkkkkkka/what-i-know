@@ -4,11 +4,13 @@ import dev.mikkkkkkka.whatiknow.domain.model.Mark
 import java.time.LocalDate
 
 interface MarkRepository {
-    suspend fun getMarksInPeriod(from: LocalDate, to: LocalDate): List<Mark>
+    suspend fun getMarksInPeriod(from: LocalDate,to: LocalDate): List<Mark>
 
     suspend fun getMark(date: LocalDate): Mark?
 
     suspend fun saveMark(mark: Mark)
+
+    suspend fun deleteMark(date: LocalDate)
 
     suspend fun sync()
 }
