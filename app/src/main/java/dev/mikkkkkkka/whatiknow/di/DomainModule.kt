@@ -4,7 +4,7 @@ import dev.mikkkkkkka.whatiknow.domain.usecase.note.DeleteNoteUseCase
 import dev.mikkkkkkka.whatiknow.domain.usecase.note.GetNoteIdsUseCase
 import dev.mikkkkkkka.whatiknow.domain.usecase.note.GetNoteUseCase
 import dev.mikkkkkkka.whatiknow.domain.usecase.note.SaveNoteUseCase
-import dev.mikkkkkkka.whatiknow.domain.usecase.note.SyncNoteUseCase
+import dev.mikkkkkkka.whatiknow.domain.usecase.note.SyncNotesUseCase
 
 interface DomainModule {
 
@@ -16,7 +16,7 @@ interface DomainModule {
 
     val deleteNoteUseCase: DeleteNoteUseCase
 
-    val syncNoteUseCase: SyncNoteUseCase
+    val syncNoteUseCase: SyncNotesUseCase
 
 }
 
