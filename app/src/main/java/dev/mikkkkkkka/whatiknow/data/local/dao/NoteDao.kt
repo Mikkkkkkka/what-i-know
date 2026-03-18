@@ -1,10 +1,11 @@
-package dev.mikkkkkkka.whatiknow.data.local
+package dev.mikkkkkkka.whatiknow.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import dev.mikkkkkkka.whatiknow.data.local.entities.NoteEntity
 
 @Dao
 interface NoteDao {

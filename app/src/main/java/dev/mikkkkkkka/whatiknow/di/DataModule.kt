@@ -1,6 +1,6 @@
 package dev.mikkkkkkka.whatiknow.di
 
-import dev.mikkkkkkka.whatiknow.data.local.NoteDao
+import dev.mikkkkkkka.whatiknow.data.local.dao.NoteDao
 import dev.mikkkkkkka.whatiknow.data.local.NoteMarkDatabase
 import dev.mikkkkkkka.whatiknow.data.mapper.RoomNoteEntityMapper
 

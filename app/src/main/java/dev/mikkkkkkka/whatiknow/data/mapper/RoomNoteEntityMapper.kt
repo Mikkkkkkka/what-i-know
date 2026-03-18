@@ -1,6 +1,6 @@
 package dev.mikkkkkkka.whatiknow.data.mapper
 
-import dev.mikkkkkkka.whatiknow.data.local.NoteEntity
+import dev.mikkkkkkka.whatiknow.data.local.entities.NoteEntity
 import dev.mikkkkkkka.whatiknow.domain.model.Note
 import java.time.LocalDateTime
 
