@@ -13,13 +13,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WhatIKnow">
         <activity
-            android:name=".ui.WorkspaceActivity"
+            android:name=".ui.workspace.WorkspaceActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.NoteActivity"
+            android:name=".ui.note.NoteActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.MarkActivity"
+            android:name=".ui.mark.MarkActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

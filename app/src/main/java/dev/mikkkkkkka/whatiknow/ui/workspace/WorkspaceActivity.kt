@@ -1,4 +1,4 @@
-package dev.mikkkkkkka.whatiknow.ui
+package dev.mikkkkkkka.whatiknow.ui.workspace
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
