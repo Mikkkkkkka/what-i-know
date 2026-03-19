@@ -1,7 +1,6 @@
 package dev.mikkkkkkka.whatiknow.data.local.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -21,7 +20,7 @@ interface NoteDao {
     @Update
     suspend fun update(note: NoteEntity)
 
-    @Delete
+    @Query("DELETE FROM NoteEntity WHERE id = :id")
     suspend fun delete(id: String)
 }
 
