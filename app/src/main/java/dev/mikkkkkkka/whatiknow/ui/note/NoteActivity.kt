@@ -1,4 +1,4 @@
-package dev.mikkkkkkka.whatiknow.presentation
+package dev.mikkkkkkka.whatiknow.ui.note
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
@@ -7,11 +7,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import dev.mikkkkkkka.whatiknow.R
 
-class WorkspaceActivity : AppCompatActivity() {
+class NoteActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContentView(R.layout.activity_workspace)
+        setContentView(R.layout.activity_note)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
