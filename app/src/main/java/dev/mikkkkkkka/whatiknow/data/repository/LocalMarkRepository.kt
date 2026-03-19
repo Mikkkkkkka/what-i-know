@@ -2,13 +2,13 @@ package dev.mikkkkkkka.whatiknow.data.repository
 
 import dev.mikkkkkkka.whatiknow.data.local.dao.MarkDao
 import dev.mikkkkkkka.whatiknow.data.mapper.RoomMarkEntityMapper
-import dev.mikkkkkkka.whatiknow.di.AppModule
 import dev.mikkkkkkka.whatiknow.domain.model.Mark
 import dev.mikkkkkkka.whatiknow.domain.repository.MarkRepository
 import java.time.LocalDate
 import java.time.LocalDateTime
+import javax.inject.Inject
 
-class LocalMarkRepository(
+class LocalMarkRepository @Inject constructor(
     private val markDao: MarkDao, private val mapper: RoomMarkEntityMapper
 ) : MarkRepository {
 
@@ -40,14 +40,5 @@ class LocalMarkRepository(
 
     override suspend fun sync() {
         // no external sync happening
-    }
-
-    companion object {
-        fun create(appModule: AppModule): LocalMarkRepository {
-            return LocalMarkRepository(
-                appModule.markDao,
-                appModule.roomMarkEntityMapper
-            )
-        }
     }
 }

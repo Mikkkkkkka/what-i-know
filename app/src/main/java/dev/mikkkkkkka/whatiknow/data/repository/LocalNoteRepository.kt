@@ -2,12 +2,12 @@ package dev.mikkkkkkka.whatiknow.data.repository
 
 import dev.mikkkkkkka.whatiknow.data.local.dao.NoteDao
 import dev.mikkkkkkka.whatiknow.data.mapper.RoomNoteEntityMapper
-import dev.mikkkkkkka.whatiknow.di.AppModule
 import dev.mikkkkkkka.whatiknow.domain.model.Note
 import dev.mikkkkkkka.whatiknow.domain.repository.NoteRepository
 import java.time.LocalDateTime
+import javax.inject.Inject
 
-class LocalNoteRepository(
+class LocalNoteRepository @Inject constructor(
     private val noteDao: NoteDao,
     private val mapper: RoomNoteEntityMapper,
 ) : NoteRepository {
@@ -36,15 +36,6 @@ class LocalNoteRepository(
 
     override suspend fun sync() {
         // no external sync happening
-    }
-
-    companion object {
-        fun create(appModule: AppModule): LocalNoteRepository {
-            return LocalNoteRepository(
-                appModule.noteDao,
-                appModule.roomNoteEntityMapper
-            )
-        }
     }
 }
 

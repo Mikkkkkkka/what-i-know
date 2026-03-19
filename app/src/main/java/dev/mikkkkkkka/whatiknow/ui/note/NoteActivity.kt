@@ -6,15 +6,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import dev.mikkkkkkka.whatiknow.WhatIKnowApplication
+import dagger.hilt.android.AndroidEntryPoint
 import dev.mikkkkkkka.whatiknow.databinding.ActivityNoteBinding
 
+@AndroidEntryPoint
 class NoteActivity : AppCompatActivity() {
     private lateinit var binding: ActivityNoteBinding
 
-    private val viewModel: NoteViewModel by viewModels {
-        NoteViewModel.factory(WhatIKnowApplication.appModule)
-    }
+    private val viewModel: NoteViewModel by viewModels()
 
     private var isApplyingState = false
 

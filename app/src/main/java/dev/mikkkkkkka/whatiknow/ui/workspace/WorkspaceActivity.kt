@@ -7,19 +7,18 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import dagger.hilt.android.AndroidEntryPoint
 import dev.mikkkkkkka.whatiknow.R
-import dev.mikkkkkkka.whatiknow.WhatIKnowApplication
 import dev.mikkkkkkka.whatiknow.databinding.ActivityWorkspaceBinding
 import dev.mikkkkkkka.whatiknow.ui.note.NoteActivity
 
+@AndroidEntryPoint
 class WorkspaceActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityWorkspaceBinding
     private lateinit var adapter: NotesAdapter
 
-    private val viewModel: WorkspaceViewModel by viewModels {
-        WorkspaceViewModel.factory(WhatIKnowApplication.appModule)
-    }
+    private val viewModel: WorkspaceViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

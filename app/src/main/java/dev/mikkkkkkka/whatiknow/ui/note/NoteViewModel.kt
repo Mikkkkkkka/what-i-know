@@ -3,9 +3,8 @@ package dev.mikkkkkkka.whatiknow.ui.note
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import dev.mikkkkkkka.whatiknow.di.AppModule
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mikkkkkkka.whatiknow.domain.model.Note
 import dev.mikkkkkkka.whatiknow.domain.usecase.note.DeleteNoteUseCase
 import dev.mikkkkkkka.whatiknow.domain.usecase.note.GetNoteUseCase
@@ -14,8 +13,10 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.UUID
+import javax.inject.Inject
 
-class NoteViewModel(
+@HiltViewModel
+class NoteViewModel @Inject constructor(
     private val getNote: GetNoteUseCase,
     private val saveNoteUseCase: SaveNoteUseCase,
     private val deleteNoteUseCase: DeleteNoteUseCase,
@@ -96,19 +97,6 @@ class NoteViewModel(
 
     companion object {
         private const val AUTOSAVE_DELAY_MS = 300L
-
-        fun factory(appModule: AppModule): ViewModelProvider.Factory {
-            return object : ViewModelProvider.Factory {
-                @Suppress("UNCHECKED_CAST")
-                override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return NoteViewModel(
-                        getNote = appModule.getNoteUseCase,
-                        saveNoteUseCase = appModule.saveNoteUseCase,
-                        deleteNoteUseCase = appModule.deleteNoteUseCase,
-                    ) as T
-                }
-            }
-        }
     }
 }
 
