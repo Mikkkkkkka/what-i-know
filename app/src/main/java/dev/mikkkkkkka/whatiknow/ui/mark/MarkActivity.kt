@@ -1,14 +1,13 @@
-package dev.mikkkkkkka.whatiknow.presentation.mark
+package dev.mikkkkkkka.whatiknow.ui.mark
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import dev.mikkkkkkka.whatiknow.presentation.note.NoteActivity
 import dev.mikkkkkkka.whatiknow.R
 import dev.mikkkkkkka.whatiknow.databinding.ActivityMarkBinding
+import dev.mikkkkkkka.whatiknow.ui.note.NoteActivity
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -17,14 +16,11 @@ class MarkActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding = ActivityMarkBinding.inflate(layoutInflater)
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
-            val bottomInset = maxOf(systemBars.bottom, ime.bottom)
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, bottomInset)
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
 

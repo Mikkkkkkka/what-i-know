@@ -13,13 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WhatIKnow">
         <activity
-            android:name=".presentation.WorkspaceActivity"
-            android:exported="false" />
-        <activity
-            android:name=".presentation.note.NoteActivity"
-            android:exported="false" />
-        <activity
-            android:name=".presentation.mark.MarkActivity"
+            android:name=".ui.workspace.WorkspaceActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,6 +21,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.note.NoteActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.mark.MarkActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

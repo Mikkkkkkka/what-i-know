@@ -1,7 +1,6 @@
 package dev.mikkkkkkka.whatiknow.data.local.dao
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
@@ -11,10 +10,10 @@ import java.time.LocalDate
 @Dao
 interface MarkDao {
     @Query("SELECT * FROM MarkEntity WHERE :from <= date AND date < :to")
-    fun getAllInPeriod(from: LocalDate, to: LocalDate): List<MarkEntity>
+    suspend fun getAllInPeriod(from: LocalDate, to: LocalDate): List<MarkEntity>
 
     @Query("SELECT * FROM MarkEntity WHERE date = :date")
-    fun getByDate(date: LocalDate): MarkEntity?
+    suspend fun getByDate(date: LocalDate): MarkEntity?
 
     @Insert
     suspend fun insert(mark: MarkEntity)
@@ -22,7 +21,7 @@ interface MarkDao {
     @Update
     suspend fun update(mark: MarkEntity)
 
-    @Delete
+    @Query("DELETE FROM MarkEntity WHERE date = :date")
     suspend fun delete(date: LocalDate)
 }
 
