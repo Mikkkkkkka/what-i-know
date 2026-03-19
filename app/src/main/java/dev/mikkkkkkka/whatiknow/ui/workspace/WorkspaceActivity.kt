@@ -8,9 +8,8 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import dev.mikkkkkkka.whatiknow.R
+import dev.mikkkkkkka.whatiknow.WhatIKnowApplication
 import dev.mikkkkkkka.whatiknow.databinding.ActivityWorkspaceBinding
-import dev.mikkkkkkka.whatiknow.di.impl.AppModuleImpl
-import dev.mikkkkkkka.whatiknow.di.impl.DomainModuleImpl
 import dev.mikkkkkkka.whatiknow.ui.note.NoteActivity
 
 class WorkspaceActivity : AppCompatActivity() {
@@ -18,7 +17,9 @@ class WorkspaceActivity : AppCompatActivity() {
     private lateinit var binding: ActivityWorkspaceBinding
     private lateinit var adapter: NotesAdapter
 
-    private val viewModel: WorkspaceViewModel by viewModels()
+    private val viewModel: WorkspaceViewModel by viewModels {
+        WorkspaceViewModel.factory(WhatIKnowApplication.appModule)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +34,10 @@ class WorkspaceActivity : AppCompatActivity() {
         setupRecycler()
         setupListeners()
         observeViewModel()
+    }
 
+    override fun onResume() {
+        super.onResume()
         viewModel.loadNotes()
     }
 

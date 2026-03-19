@@ -20,8 +20,7 @@ class NotesAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater
-            .from(parent.context)
+        val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_note, parent, false)
 
         return ViewHolder(view)
@@ -33,12 +32,12 @@ class NotesAdapter(
 
     override fun getItemCount(): Int = noteIds.size
 
-    class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val title: TextView = view.findViewById(R.id.noteTitle)
 
         fun bind(noteId: String, onClick: (String) -> Unit) {
             title.text = noteId
-            view.setOnClickListener { onClick(noteId) }
+            itemView.setOnClickListener { onClick(noteId) }
         }
     }
 }
