@@ -1,4 +1,4 @@
-package dev.mikkkkkkka.whatiknow.ui.mark
+package dev.mikkkkkkka.whatiknow.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
-import dev.mikkkkkkka.whatiknow.ui.note.NoteActivity
 import dev.mikkkkkkka.whatiknow.R
 import dev.mikkkkkkka.whatiknow.databinding.ActivityMarkBinding
 import java.time.LocalDate

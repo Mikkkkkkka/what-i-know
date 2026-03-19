@@ -1,4 +1,4 @@
-package dev.mikkkkkkka.whatiknow.ui.note
+package dev.mikkkkkkka.whatiknow.ui
 
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
