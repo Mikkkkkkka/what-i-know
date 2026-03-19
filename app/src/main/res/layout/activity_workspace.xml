@@ -8,12 +8,13 @@
     tools:context=".ui.workspace.WorkspaceActivity">
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/notesRecycler"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/bottomDivider"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topDivider"
-        app:layout_constraintBottom_toTopOf="@+id/bottomDivider" />
+        app:layout_constraintTop_toBottomOf="@+id/topDivider" />
 
     <TextView
         android:id="@+id/titleTextView"
