@@ -1,4 +1,4 @@
-package dev.mikkkkkkka.whatiknow.data.local
+package dev.mikkkkkkka.whatiknow.data.local.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

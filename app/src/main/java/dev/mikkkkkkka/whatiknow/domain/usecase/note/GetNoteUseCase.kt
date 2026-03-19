@@ -1,4 +1,4 @@
-package dev.mikkkkkkka.whatiknow.domain.usecase
+package dev.mikkkkkkka.whatiknow.domain.usecase.note
 
 import dev.mikkkkkkka.whatiknow.di.AppModule
 import dev.mikkkkkkka.whatiknow.domain.model.Note

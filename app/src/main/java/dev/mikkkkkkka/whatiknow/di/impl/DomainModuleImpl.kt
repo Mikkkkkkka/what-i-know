@@ -2,11 +2,11 @@ package dev.mikkkkkkka.whatiknow.di.impl
 
 import dev.mikkkkkkka.whatiknow.WhatIKnowApplication
 import dev.mikkkkkkka.whatiknow.di.DomainModule
-import dev.mikkkkkkka.whatiknow.domain.usecase.DeleteNoteUseCase
-import dev.mikkkkkkka.whatiknow.domain.usecase.GetNoteIdsUseCase
-import dev.mikkkkkkka.whatiknow.domain.usecase.GetNoteUseCase
-import dev.mikkkkkkka.whatiknow.domain.usecase.SaveNoteUseCase
-import dev.mikkkkkkka.whatiknow.domain.usecase.SyncNoteUseCase
+import dev.mikkkkkkka.whatiknow.domain.usecase.note.DeleteNoteUseCase
+import dev.mikkkkkkka.whatiknow.domain.usecase.note.GetNoteIdsUseCase
+import dev.mikkkkkkka.whatiknow.domain.usecase.note.GetNoteUseCase
+import dev.mikkkkkkka.whatiknow.domain.usecase.note.SaveNoteUseCase
+import dev.mikkkkkkka.whatiknow.domain.usecase.note.SyncNotesUseCase
 
 class DomainModuleImpl : DomainModule {
 
@@ -26,8 +26,8 @@ class DomainModuleImpl : DomainModule {
         DeleteNoteUseCase.create(WhatIKnowApplication.appModule)
     }
 
-    override val syncNoteUseCase: SyncNoteUseCase by lazy {
-        SyncNoteUseCase.create(WhatIKnowApplication.appModule)
+    override val syncNoteUseCase: SyncNotesUseCase by lazy {
+        SyncNotesUseCase.create(WhatIKnowApplication.appModule)
     }
 
 }

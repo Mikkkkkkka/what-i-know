@@ -1,9 +1,9 @@
-package dev.mikkkkkkka.whatiknow.domain.usecase
+package dev.mikkkkkkka.whatiknow.domain.usecase.note
 
 import dev.mikkkkkkka.whatiknow.di.AppModule
 import dev.mikkkkkkka.whatiknow.domain.repository.NoteRepository
 
-class SyncNoteUseCase(
+class SyncNotesUseCase(
     private val repository: NoteRepository
 ) {
     suspend operator fun invoke() {
@@ -11,8 +11,8 @@ class SyncNoteUseCase(
     }
 
     companion object {
-        fun create(appModule: AppModule): SyncNoteUseCase {
-            return SyncNoteUseCase(appModule.noteRepository)
+        fun create(appModule: AppModule): SyncNotesUseCase {
+            return SyncNotesUseCase(appModule.noteRepository)
         }
     }
 }

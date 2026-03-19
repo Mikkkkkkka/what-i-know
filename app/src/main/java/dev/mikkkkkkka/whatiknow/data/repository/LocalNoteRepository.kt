@@ -1,6 +1,6 @@
 package dev.mikkkkkkka.whatiknow.data.repository
 
-import dev.mikkkkkkka.whatiknow.data.local.NoteDao
+import dev.mikkkkkkka.whatiknow.data.local.dao.NoteDao
 import dev.mikkkkkkka.whatiknow.data.mapper.RoomNoteEntityMapper
 import dev.mikkkkkkka.whatiknow.di.AppModule
 import dev.mikkkkkkka.whatiknow.domain.model.Note
