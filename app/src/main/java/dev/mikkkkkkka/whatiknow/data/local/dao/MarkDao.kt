@@ -10,10 +10,10 @@ import java.time.LocalDate
 @Dao
 interface MarkDao {
     @Query("SELECT * FROM MarkEntity WHERE :from <= date AND date < :to")
-    fun getAllInPeriod(from: LocalDate, to: LocalDate): List<MarkEntity>
+    suspend fun getAllInPeriod(from: LocalDate, to: LocalDate): List<MarkEntity>
 
     @Query("SELECT * FROM MarkEntity WHERE date = :date")
-    fun getByDate(date: LocalDate): MarkEntity?
+    suspend fun getByDate(date: LocalDate): MarkEntity?
 
     @Insert
     suspend fun insert(mark: MarkEntity)

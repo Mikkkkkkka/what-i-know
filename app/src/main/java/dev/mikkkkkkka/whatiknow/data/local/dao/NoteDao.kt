@@ -9,10 +9,10 @@ import dev.mikkkkkkka.whatiknow.data.local.entities.NoteEntity
 @Dao
 interface NoteDao {
     @Query("SELECT id FROM NoteEntity")
-    fun getAllIds(): List<String>
+    suspend fun getAllIds(): List<String>
 
     @Query("SELECT * FROM NoteEntity WHERE id = :id")
-    fun getById(id: String): NoteEntity?
+    suspend fun getById(id: String): NoteEntity?
 
     @Insert
     suspend fun insert(note: NoteEntity)
