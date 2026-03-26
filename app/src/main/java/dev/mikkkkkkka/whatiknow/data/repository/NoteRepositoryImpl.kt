@@ -1,9 +1,15 @@
 package dev.mikkkkkkka.whatiknow.data.repository
 
 import dev.mikkkkkkka.whatiknow.domain.model.Note
+import dev.mikkkkkkka.whatiknow.domain.model.NoteSummary
 import dev.mikkkkkkka.whatiknow.domain.repository.NoteRepository
+import kotlinx.coroutines.flow.Flow
 
 class NoteRepositoryImpl : NoteRepository {
+    override fun getNoteSummaries(): Flow<List<NoteSummary>> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun getNoteIds(): List<String> {
         TODO("Not yet implemented")
     }

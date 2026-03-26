@@ -38,11 +38,6 @@ class WorkspaceFragment : Fragment(R.layout.fragment_workspace) {
         observeViewModel()
     }
 
-    override fun onResume() {
-        super.onResume()
-        viewModel.loadNotes()
-    }
-
     override fun onDestroyView() {
         binding = null
         super.onDestroyView()

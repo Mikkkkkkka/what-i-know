@@ -3,7 +3,10 @@ package dev.mikkkkkkka.whatiknow.data.repository
 import dev.mikkkkkkka.whatiknow.data.local.dao.NoteDao
 import dev.mikkkkkkka.whatiknow.data.mapper.RoomNoteEntityMapper
 import dev.mikkkkkkka.whatiknow.domain.model.Note
+import dev.mikkkkkkka.whatiknow.domain.model.NoteSummary
 import dev.mikkkkkkka.whatiknow.domain.repository.NoteRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -12,8 +15,19 @@ class LocalNoteRepository @Inject constructor(
     private val mapper: RoomNoteEntityMapper,
 ) : NoteRepository {
 
+    override fun getNoteSummaries(): Flow<List<NoteSummary>> {
+        return noteDao.observeAll().map { notes ->
+            notes.map { note ->
+                NoteSummary(
+                    id = note.id,
+                    name = note.name,
+                )
+            }
+        }
+    }
+
     override suspend fun getNoteIds(): List<String> {
-        return noteDao.getAllIds();
+        return noteDao.getAllIds()
     }
 
     override suspend fun getNoteNames(): List<String> {

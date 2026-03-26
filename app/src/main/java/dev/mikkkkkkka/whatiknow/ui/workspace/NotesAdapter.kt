@@ -6,16 +6,17 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import dev.mikkkkkkka.whatiknow.R
+import dev.mikkkkkkka.whatiknow.domain.model.NoteSummary
 
 class NotesAdapter(
     private val onClick: (noteId: String) -> Unit
 ) : RecyclerView.Adapter<NotesAdapter.ViewHolder>() {
 
-    private val noteIdNames = mutableListOf<Pair<String, String>>()
+    private val noteSummaries = mutableListOf<NoteSummary>()
 
-    fun submitList(list: List<Pair<String, String>>) {
-        noteIdNames.clear()
-        noteIdNames.addAll(list)
+    fun submitList(list: List<NoteSummary>) {
+        noteSummaries.clear()
+        noteSummaries.addAll(list)
         notifyDataSetChanged()
     }
 
@@ -27,17 +28,17 @@ class NotesAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(noteIdNames[position], onClick)
+        holder.bind(noteSummaries[position], onClick)
     }
 
-    override fun getItemCount(): Int = noteIdNames.size
+    override fun getItemCount(): Int = noteSummaries.size
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val title: TextView = view.findViewById(R.id.noteTitle)
 
-        fun bind(noteIdName: Pair<String, String>, onClick: (String) -> Unit) {
-            title.text = noteIdName.second
-            itemView.setOnClickListener { onClick(noteIdName.first) }
+        fun bind(noteSummary: NoteSummary, onClick: (String) -> Unit) {
+            title.text = noteSummary.name
+            itemView.setOnClickListener { onClick(noteSummary.id) }
         }
     }
 }
