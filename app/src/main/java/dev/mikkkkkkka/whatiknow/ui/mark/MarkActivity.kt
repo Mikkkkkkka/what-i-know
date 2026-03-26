@@ -24,7 +24,7 @@ class MarkActivity : AppCompatActivity() {
         }
 
         binding.dateTextView.setOnClickListener { incrementDate() }
-        binding.newButton.setOnClickListener { startNewNoteActivity() }
+        binding.workspaceButton.setOnClickListener { startWorkspaceActivity() }
     }
 
     private fun openCalendar() {}
@@ -37,7 +37,7 @@ class MarkActivity : AppCompatActivity() {
         binding.dateTextView.text = newDate.format(formatter)
     }
 
-    private fun startNewNoteActivity() {
-        startActivity(WorkspaceActivity.createNewNoteIntent(this))
+    private fun startWorkspaceActivity() {
+        startActivity(WorkspaceActivity.createIntent(this))
     }
 }

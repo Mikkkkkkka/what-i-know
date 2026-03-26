@@ -16,6 +16,7 @@ class WorkspaceFragment : Fragment(R.layout.fragment_workspace) {
     interface Callbacks {
         fun onOpenNote(noteId: String)
         fun onCreateNote()
+        fun onOpenMarks()
     }
 
     private var callbacks: Callbacks? = null
@@ -60,6 +61,9 @@ class WorkspaceFragment : Fragment(R.layout.fragment_workspace) {
     private fun setupListeners() {
         binding?.newButton?.setOnClickListener {
             callbacks?.onCreateNote()
+        }
+        binding?.marksButton?.setOnClickListener {
+            callbacks?.onOpenMarks()
         }
     }
 

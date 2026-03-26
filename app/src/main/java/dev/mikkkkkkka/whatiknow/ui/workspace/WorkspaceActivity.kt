@@ -10,6 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import dagger.hilt.android.AndroidEntryPoint
 import dev.mikkkkkkka.whatiknow.databinding.ActivityWorkspaceBinding
+import dev.mikkkkkkka.whatiknow.ui.mark.MarkActivity
 import dev.mikkkkkkka.whatiknow.ui.note.NoteFragment
 
 @AndroidEntryPoint
@@ -62,6 +63,11 @@ class WorkspaceActivity : AppCompatActivity(), WorkspaceFragment.Callbacks {
 
     override fun onCreateNote() {
         showNote(noteId = null)
+    }
+
+    override fun onOpenMarks() {
+        val intent = Intent(this, MarkActivity::class.java)
+        startActivity(intent)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

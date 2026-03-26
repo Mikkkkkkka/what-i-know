@@ -8,11 +8,11 @@
     tools:context=".ui.mark.MarkActivity">
 
     <Button
-        android:id="@+id/newButton"
+        android:id="@+id/workspaceButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:text="+"
+        android:text="Workspace"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -43,7 +43,7 @@
         android:layout_height="1dp"
         android:layout_marginBottom="8dp"
         android:background="?android:attr/listDivider"
-        app:layout_constraintBottom_toTopOf="@+id/newButton"
+        app:layout_constraintBottom_toTopOf="@+id/workspaceButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
