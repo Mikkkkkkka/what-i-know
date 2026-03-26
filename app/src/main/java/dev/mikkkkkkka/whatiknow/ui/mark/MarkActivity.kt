@@ -1,13 +1,12 @@
 package dev.mikkkkkkka.whatiknow.ui.mark
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import dev.mikkkkkkka.whatiknow.R
 import dev.mikkkkkkka.whatiknow.databinding.ActivityMarkBinding
-import dev.mikkkkkkka.whatiknow.ui.note.NoteActivity
+import dev.mikkkkkkka.whatiknow.ui.workspace.WorkspaceActivity
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
@@ -39,7 +38,6 @@ class MarkActivity : AppCompatActivity() {
     }
 
     private fun startNewNoteActivity() {
-        val intent = Intent(this, NoteActivity::class.java)
-        startActivity(intent)
+        startActivity(WorkspaceActivity.createNewNoteIntent(this))
     }
 }

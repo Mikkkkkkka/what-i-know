@@ -11,11 +11,11 @@ class NotesAdapter(
     private val onClick: (noteId: String) -> Unit
 ) : RecyclerView.Adapter<NotesAdapter.ViewHolder>() {
 
-    private val noteIds = mutableListOf<String>()
+    private val noteIdNames = mutableListOf<Pair<String, String>>()
 
-    fun submitList(list: List<String>) {
-        noteIds.clear()
-        noteIds.addAll(list)
+    fun submitList(list: List<Pair<String, String>>) {
+        noteIdNames.clear()
+        noteIdNames.addAll(list)
         notifyDataSetChanged()
     }
 
@@ -27,17 +27,17 @@ class NotesAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(noteIds[position], onClick)
+        holder.bind(noteIdNames[position], onClick)
     }
 
-    override fun getItemCount(): Int = noteIds.size
+    override fun getItemCount(): Int = noteIdNames.size
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val title: TextView = view.findViewById(R.id.noteTitle)
 
-        fun bind(noteId: String, onClick: (String) -> Unit) {
-            title.text = noteId
-            itemView.setOnClickListener { onClick(noteId) }
+        fun bind(noteIdName: Pair<String, String>, onClick: (String) -> Unit) {
+            title.text = noteIdName.second
+            itemView.setOnClickListener { onClick(noteIdName.first) }
         }
     }
 }

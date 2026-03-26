@@ -1,5 +1,6 @@
 package dev.mikkkkkkka.whatiknow.ui.note
 
+import android.content.Intent
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -83,6 +84,7 @@ class NoteViewModel @Inject constructor(
         saveNoteUseCase(
             Note(
                 id = noteId,
+                name = normalizedContent.toNoteTitle(),
                 content = normalizedContent,
             )
         )
@@ -93,6 +95,8 @@ class NoteViewModel @Inject constructor(
             content = normalizedContent,
             isExistingNote = true,
         )
+
+        // notify WorkspaceFragment about potential repo change
     }
 
     companion object {

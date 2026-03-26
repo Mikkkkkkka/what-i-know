@@ -22,9 +22,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ui.note.NoteActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.mark.MarkActivity"
             android:exported="false" />
     </application>
