@@ -1,6 +1,7 @@
 package dev.mikkkkkkka.whatiknow.ui.mark
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -23,11 +24,25 @@ class MarkActivity : AppCompatActivity() {
             insets
         }
 
-        binding.dateTextView.setOnClickListener { incrementDate() }
+        closeCalendar()
+        binding.dateTextView.setOnClickListener { toggleCalendar() }
         binding.workspaceButton.setOnClickListener { startWorkspaceActivity() }
     }
 
-    private fun openCalendar() {}
+    private fun toggleCalendar() {
+        when (binding.dateSelectCalendarView.visibility) {
+            View.GONE -> openCalendar()
+            else -> closeCalendar()
+        }
+    }
+
+    private fun openCalendar() {
+        binding.dateSelectCalendarView.visibility = View.VISIBLE
+    }
+
+    private fun closeCalendar() {
+        binding.dateSelectCalendarView.visibility = View.GONE
+    }
 
     private fun incrementDate() {
         val text = binding.dateTextView.text
@@ -38,6 +53,10 @@ class MarkActivity : AppCompatActivity() {
     }
 
     private fun startWorkspaceActivity() {
-        startActivity(WorkspaceActivity.createIntent(this))
+        if (callingActivity?.className == WorkspaceActivity.toString()) {
+            startActivity(WorkspaceActivity.createIntent(this))
+        } else {
+            finish()
+        }
     }
 }
