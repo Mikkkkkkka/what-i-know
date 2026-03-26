@@ -8,8 +8,11 @@ import dev.mikkkkkkka.whatiknow.data.local.entities.NoteEntity
 
 @Dao
 interface NoteDao {
-    @Query("SELECT id FROM NoteEntity")
+    @Query("SELECT id FROM NoteEntity ORDER BY id")
     suspend fun getAllIds(): List<String>
+
+    @Query("SELECT name FROM NoteEntity ORDER BY id")
+    suspend fun getAllNames(): List<String>
 
     @Query("SELECT * FROM NoteEntity WHERE id = :id")
     suspend fun getById(id: String): NoteEntity?

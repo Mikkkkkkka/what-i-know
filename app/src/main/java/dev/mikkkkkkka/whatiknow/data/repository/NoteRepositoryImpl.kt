@@ -8,6 +8,10 @@ class NoteRepositoryImpl : NoteRepository {
         TODO("Not yet implemented")
     }
 
+    override suspend fun getNoteNames(): List<String> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun getNote(id: String): Note? {
         TODO("Not yet implemented")
     }

@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 @Entity
 data class NoteEntity(
     @PrimaryKey val id: String,
+    val name: String,
     val content: String,
     val updatedAt: LocalDateTime,
 )

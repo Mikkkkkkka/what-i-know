@@ -13,7 +13,11 @@ class LocalNoteRepository @Inject constructor(
 ) : NoteRepository {
 
     override suspend fun getNoteIds(): List<String> {
-        return noteDao.getAllIds()
+        return noteDao.getAllIds();
+    }
+
+    override suspend fun getNoteNames(): List<String> {
+        return noteDao.getAllNames()
     }
 
     override suspend fun getNote(id: String): Note? {

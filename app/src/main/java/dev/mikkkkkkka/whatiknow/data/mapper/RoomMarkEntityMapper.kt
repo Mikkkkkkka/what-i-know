@@ -7,6 +7,7 @@ import java.time.LocalDateTime
 class RoomMarkEntityMapper {
     fun map(roomMark: MarkEntity): Mark {
         return Mark(
+            roomMark.id,
             roomMark.date,
             roomMark.content,
         )
@@ -14,6 +15,7 @@ class RoomMarkEntityMapper {
 
     fun unmap(note: Mark, updatedAt: LocalDateTime): MarkEntity {
         return MarkEntity(
+            note.id,
             note.date,
             note.content,
             updatedAt,

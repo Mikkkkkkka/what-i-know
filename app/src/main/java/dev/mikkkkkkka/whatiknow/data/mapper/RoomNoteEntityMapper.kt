@@ -8,6 +8,7 @@ class RoomNoteEntityMapper {
     fun map(roomNote: NoteEntity): Note {
         return Note(
             roomNote.id,
+            roomNote.name,
             roomNote.content,
         )
     }
@@ -15,6 +16,7 @@ class RoomNoteEntityMapper {
     fun unmap(note: Note, updatedAt: LocalDateTime): NoteEntity {
         return NoteEntity(
             note.id,
+            note.name,
             note.content,
             updatedAt,
         )

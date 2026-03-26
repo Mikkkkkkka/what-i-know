@@ -7,7 +7,8 @@ import java.time.LocalDateTime
 
 @Entity
 data class MarkEntity(
-    @PrimaryKey val date: LocalDate,
+    @PrimaryKey val id: String,
+    val date: LocalDate,
     val content: String,
     val updatedAt: LocalDateTime,
 )

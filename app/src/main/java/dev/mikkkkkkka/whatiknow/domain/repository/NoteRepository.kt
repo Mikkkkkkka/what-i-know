@@ -5,6 +5,8 @@ import dev.mikkkkkkka.whatiknow.domain.model.Note
 interface NoteRepository {
     suspend fun getNoteIds(): List<String>
 
+    suspend fun getNoteNames(): List<String>
+
     suspend fun getNote(id: String): Note?
 
     suspend fun saveNote(note: Note)
