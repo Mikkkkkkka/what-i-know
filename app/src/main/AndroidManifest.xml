@@ -16,6 +16,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WhatIKnow">
         <activity
+            android:name=".ui.auth.AuthActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.workspace.WorkspaceActivity"
             android:exported="true">
             <intent-filter>
