@@ -23,7 +23,7 @@ What I Know is an Android note-taking app built for the ITMO x Alfa-Bank Mobile 
 ## Requirements
 
 - Android Studio with the Android SDK installed
-- JDK 11
+- JDK 17 or newer (JDK 21 is also supported)
 - Docker Desktop or Docker Engine with Docker Compose
 - An Android emulator or a physical Android device
 - The local backend stack in [`docker-compose.yaml`](docker-compose.yaml) if you want to test authentication and sync
