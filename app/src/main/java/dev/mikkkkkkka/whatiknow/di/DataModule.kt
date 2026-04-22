@@ -18,6 +18,7 @@ import dev.mikkkkkkka.whatiknow.data.mapper.RoomMarkEntityMapper
 import dev.mikkkkkkka.whatiknow.data.mapper.RoomNoteEntityMapper
 import dev.mikkkkkkka.whatiknow.data.remote.ApiErrorParser
 import dev.mikkkkkkka.whatiknow.data.remote.api.AuthApi
+import dev.mikkkkkkka.whatiknow.data.remote.api.EchoApi
 import dev.mikkkkkkka.whatiknow.data.remote.api.MarksApi
 import dev.mikkkkkkka.whatiknow.data.remote.api.NotesApi
 import dev.mikkkkkkka.whatiknow.data.session.AuthInterceptor
@@ -116,6 +117,12 @@ object DataModule {
     fun provideMarksApi(
         retrofit: Retrofit,
     ): MarksApi = retrofit.create(MarksApi::class.java)
+
+    @Provides
+    @Singleton
+    fun provideEchoApi(
+        retrofit: Retrofit,
+    ): EchoApi = retrofit.create(EchoApi::class.java)
 
     @Provides
     @Singleton
