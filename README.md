@@ -26,7 +26,7 @@ What I Know is an Android note-taking app built for the ITMO x Alfa-Bank Mobile 
 - JDK 17 or newer (JDK 21 is also supported)
 - Docker Desktop or Docker Engine with Docker Compose
 - An Android emulator or a physical Android device
-- The local backend stack in [`docker-compose.yaml`](docker-compose.yaml) if you want to test authentication and sync
+- The local backend stack in [`compose.yaml`](compose.yaml) if you want to test authentication and sync
 
 ## Getting Started
 
@@ -65,7 +65,7 @@ Cleartext traffic is allowed for `10.0.2.2` and `localhost` in debug-oriented lo
 
 ### Local Backend With Docker Compose
 
-The repository includes [`docker-compose.yaml`](docker-compose.yaml) for local testing and contributor setup.
+The repository includes [`docker-compose.yaml`](compose.yaml) for local testing and contributor setup.
 
 It starts:
 
