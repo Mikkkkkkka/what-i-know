@@ -2,25 +2,29 @@ package dev.mikkkkkkka.whatiknow.ui.mark
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.widget.doAfterTextChanged
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
+import dagger.hilt.android.AndroidEntryPoint
 import dev.mikkkkkkka.whatiknow.R
 import dev.mikkkkkkka.whatiknow.databinding.ActivityMarkBinding
 import dev.mikkkkkkka.whatiknow.ui.workspace.WorkspaceActivity
-import java.time.DayOfWeek
-import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.YearMonth
 
+@AndroidEntryPoint
 class MarkActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMarkBinding
+    private lateinit var viewModel: MarkViewModel
     private val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-    private var selectedDate: LocalDate = LocalDate.now()
+    private var isApplyingState = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMarkBinding.inflate(layoutInflater)
+        viewModel = ViewModelProvider(this)[MarkViewModel::class.java]
         setContentView(binding.root)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -28,21 +32,47 @@ class MarkActivity : AppCompatActivity() {
             insets
         }
 
-        bindCalendar()
+        setupEditor()
+        observeViewModel()
         closeCalendar()
         binding.dateTextView.setOnClickListener { toggleCalendar() }
         binding.workspaceButton.setOnClickListener { startWorkspaceActivity() }
+        viewModel.loadInitialDate()
     }
 
-    private fun bindCalendar() {
-        binding.dateTextView.text = selectedDate.format(dateFormatter)
-        binding.calendarHeatmapView.setMonth(YearMonth.from(selectedDate))
-        binding.calendarHeatmapView.setSelectedDate(selectedDate)
-        binding.calendarHeatmapView.setData(buildPreviewHeatmapData(YearMonth.from(selectedDate)))
+    override fun onPause() {
+        if (::viewModel.isInitialized) {
+            viewModel.saveImmediately(binding.noteEditText.text?.toString().orEmpty())
+        }
+        super.onPause()
+    }
+
+    private fun setupEditor() {
+        binding.noteEditText.doAfterTextChanged { editable ->
+            if (isApplyingState) return@doAfterTextChanged
+            viewModel.onContentChanged(editable?.toString().orEmpty())
+        }
+
         binding.calendarHeatmapView.onDateClick = { date ->
-            selectedDate = date
-            binding.dateTextView.text = selectedDate.format(dateFormatter)
+            viewModel.selectDate(date)
             closeCalendar()
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.state.observe(this) { state ->
+            binding.dateTextView.text = state.selectedDate.format(dateFormatter)
+            binding.calendarHeatmapView.setMonth(YearMonth.from(state.selectedDate))
+            binding.calendarHeatmapView.setSelectedDate(state.selectedDate)
+            binding.calendarHeatmapView.setData(state.heatmapValues)
+
+            val currentText = binding.noteEditText.text?.toString().orEmpty()
+            if (currentText != state.content) {
+                isApplyingState = true
+                binding.noteEditText.setText(state.content)
+                binding.noteEditText.setSelection(binding.noteEditText.text?.length ?: 0)
+                isApplyingState = false
+            }
         }
     }
 
@@ -67,23 +97,5 @@ class MarkActivity : AppCompatActivity() {
         } else {
             finish()
         }
-    }
-
-    private fun buildPreviewHeatmapData(month: YearMonth): Map<LocalDate, Int> {
-        val values = mutableMapOf<LocalDate, Int>()
-        for (day in 1..month.lengthOfMonth()) {
-            val date = month.atDay(day)
-            val count = when {
-                date == LocalDate.now() -> 4
-                date.dayOfWeek == DayOfWeek.MONDAY -> 2
-                date.dayOfWeek == DayOfWeek.FRIDAY -> 3
-                day % 5 == 0 -> 1
-                else -> 0
-            }
-            if (count > 0) {
-                values[date] = count
-            }
-        }
-        return values
     }
 }
