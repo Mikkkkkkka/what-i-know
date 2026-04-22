@@ -72,8 +72,6 @@ class WorkspaceFragment : Fragment(R.layout.fragment_workspace) {
     }
 
     private fun observeViewModel() {
-        viewModel.notes.observe(viewLifecycleOwner) { notes ->
-            adapter.submitList(notes)
-        }
+        adapter.submitList(emptyList())
     }
 }

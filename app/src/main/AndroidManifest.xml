@@ -15,9 +15,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.WhatIKnow">
         <activity
-            android:name=".ui.auth.AuthActivity"
-            android:exported="false" />
-        <activity
             android:name=".ui.workspace.WorkspaceActivity"
             android:exported="true">
             <intent-filter>
@@ -26,9 +23,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.mark.MarkActivity"
-            android:exported="false" />
     </application>
 
 </manifest>
