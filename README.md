@@ -7,10 +7,11 @@ What I Know is an Android note-taking app built for the ITMO x Alfa-Bank Mobile 
 1. Core разработка
 2. Основные экраны, .XML layouts.
 3. Web-слой, Retrofit и Gson.
-4. Кастомные View. [CalendarHeatmapView.kt](app/src/main/java/dev/mikkkkkkka/whatiknow/ui/mark/CalendarHeatmapView.kt) - кастомный календарь отображающий количество записей в каждой дате
-5. UI-Архитектуры, MVVM
-6. Дизайн система
-7. BDUI - смотри ветку bdui
+4. Кастомные View.
+    * [CalendarHeatmapView.kt](app/src/main/java/dev/mikkkkkkka/whatiknow/ui/mark/CalendarHeatmapView.kt) - кастомный календарь отображающий количество записей в каждой дате
+7. UI-Архитектуры, MVVM
+8. Дизайн система
+9. BDUI - смотри ветку bdui
 
 ## Features
 
