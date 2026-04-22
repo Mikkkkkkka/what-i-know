@@ -1,14 +1,15 @@
 # What I Know
 
-What I Know is an Android note-taking app built for the ITMO x Alfa-Bank Mobile Development course. In this branch the app is rewritten around a BDUI flow: screen templates are loaded from Alfa Echo API, and notes are stored in the same generic JSON backend.
+What I Know is an Android note-taking app built for the ITMO x Alfa-Bank Mobile Development course. In this branch the main notes flow is rewritten around a stricter BDUI setup: screen schemas are loaded from Alfa Echo API, parsed into typed models, and rendered by a generic Compose renderer.
 
 ## Features
 
 - Compose-based single-activity app with a local design system.
-- Backend-driven home and editor screens rendered from JSON templates.
+- Backend-driven home and editor screens rendered from versioned JSON schemas.
 - Cloud note storage through `PUT/GET /server/echo/{echoPath}`.
 - Automatic template bootstrapping when Echo storage is empty.
 - Cached note fallback when the remote backend is unavailable.
+- Typed schema parsing with validation and fallback to embedded templates.
 
 ## Tech Stack
 
@@ -53,7 +54,7 @@ The client uses these namespaces:
 
 ## Usage
 
-On first launch, the app seeds default BDUI templates into Echo if they do not exist yet. After that you can:
+On first launch, the app seeds default BDUI templates into Echo if they do not exist yet. After that the app treats Echo as the primary source of truth for the home and editor screens. You can:
 
 - refresh remote templates and note data
 - create notes
@@ -65,6 +66,7 @@ If Echo is unavailable, the last cached notes remain visible locally.
 ## Development Notes
 
 - The main application entry point is [`WorkspaceActivity`](app/src/main/java/dev/mikkkkkkka/whatiknow/ui/workspace/WorkspaceActivity.kt).
+- BDUI schema models and parser live in [`data/remote/bdui`](app/src/main/java/dev/mikkkkkkka/whatiknow/data/remote/bdui).
 - BDUI rendering lives in [`WorkspaceRoute.kt`](app/src/main/java/dev/mikkkkkkka/whatiknow/ui/workspace/WorkspaceRoute.kt).
 - Echo integration lives in [`BduiRepository.kt`](app/src/main/java/dev/mikkkkkkka/whatiknow/data/remote/BduiRepository.kt).
 

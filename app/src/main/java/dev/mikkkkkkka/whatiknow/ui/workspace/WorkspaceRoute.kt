@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -23,6 +24,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -30,21 +32,45 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.gson.JsonArray
-import com.google.gson.JsonObject
 import dev.mikkkkkkka.whatiknow.data.remote.BduiNote
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.ActionItem
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.ActionsComponent
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.BduiAction
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.BduiComponent
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.BduiDestination
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.BduiScreen
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.EditorComponent
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.HeroComponent
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.NoteListComponent
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.StatsComponent
 
 @Composable
 fun WorkspaceRoute(
     viewModel: WorkspaceViewModel,
+    onOpenMark: () -> Unit = {},
+    onOpenAuth: () -> Unit = {},
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(state.externalNavigation) {
+        when (state.externalNavigation) {
+            BduiDestination.MARK -> {
+                onOpenMark()
+                viewModel.onExternalNavigationHandled()
+            }
+            BduiDestination.AUTH -> {
+                onOpenAuth()
+                viewModel.onExternalNavigationHandled()
+            }
+            else -> Unit
+        }
+    }
     WorkspaceScreen(
         state = state,
         onAction = viewModel::onAction,
@@ -56,13 +82,14 @@ fun WorkspaceRoute(
 @Composable
 private fun WorkspaceScreen(
     state: WorkspaceUiState,
-    onAction: (String, String?) -> Unit,
+    onAction: (BduiAction, String?) -> Unit,
     onTitleChange: (String) -> Unit,
     onBodyChange: (String) -> Unit,
 ) {
-    val template = if (state.route == WorkspaceDestination.EDITOR) state.editorTemplate else state.homeTemplate
-    val title = template.string("title").resolve(state)
-    val subtitle = template.string("subtitle").resolve(state)
+    val template = when (state.route) {
+        WorkspaceDestination.HOME -> state.homeTemplate
+        WorkspaceDestination.EDITOR -> state.editorTemplate
+    }
 
     Scaffold(
         modifier = Modifier
@@ -70,6 +97,21 @@ private fun WorkspaceScreen(
             .background(MaterialTheme.colorScheme.background),
         containerColor = MaterialTheme.colorScheme.background,
     ) { innerPadding ->
+        if (template == null) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)
+                    .safeDrawingPadding()
+                    .navigationBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 12.dp),
+                verticalArrangement = Arrangement.Center,
+            ) {
+                CircularProgressIndicator()
+            }
+            return@Scaffold
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -79,14 +121,14 @@ private fun WorkspaceScreen(
                 .padding(horizontal = 20.dp, vertical = 12.dp),
         ) {
             Text(
-                text = title,
+                text = template.title.resolve(state),
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onBackground,
             )
-            if (subtitle.isNotBlank()) {
+            if (template.subtitle.isNotBlank()) {
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = subtitle,
+                    text = template.subtitle.resolve(state),
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -120,20 +162,18 @@ private fun WorkspaceScreen(
 @Composable
 private fun RenderBduiComponents(
     state: WorkspaceUiState,
-    template: JsonObject,
-    onAction: (String, String?) -> Unit,
+    template: BduiScreen,
+    onAction: (BduiAction, String?) -> Unit,
     onTitleChange: (String) -> Unit,
     onBodyChange: (String) -> Unit,
 ) {
-    val components = template.array("components")
     if (state.route == WorkspaceDestination.HOME) {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            items(components.size()) { index ->
-                val component = components[index]
+            items(template.components, key = { it.id }) { component ->
                 RenderComponent(
-                    component = component.asJsonObject,
+                    component = component,
                     state = state,
                     onAction = onAction,
                     onTitleChange = onTitleChange,
@@ -146,9 +186,9 @@ private fun RenderBduiComponents(
             modifier = Modifier.verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            components.forEach { component ->
+            template.components.forEach { component ->
                 RenderComponent(
-                    component = component.asJsonObject,
+                    component = component,
                     state = state,
                     onAction = onAction,
                     onTitleChange = onTitleChange,
@@ -161,23 +201,24 @@ private fun RenderBduiComponents(
 
 @Composable
 private fun RenderComponent(
-    component: JsonObject,
+    component: BduiComponent,
     state: WorkspaceUiState,
-    onAction: (String, String?) -> Unit,
+    onAction: (BduiAction, String?) -> Unit,
     onTitleChange: (String) -> Unit,
     onBodyChange: (String) -> Unit,
 ) {
-    when (component.string("type")) {
-        "hero" -> HeroCard(component, state)
-        "stats" -> StatsRow(component, state)
-        "actions" -> ActionRow(component, state, onAction)
-        "note_list" -> NotesList(component, state, onAction)
-        "editor" -> EditorCard(component, state, onAction, onTitleChange, onBodyChange)
+    when (component) {
+        is HeroComponent -> HeroCard(component, state)
+        is StatsComponent -> StatsRow(component, state)
+        is ActionsComponent -> ActionRow(component, state, onAction)
+        is NoteListComponent -> NotesList(component, state, onAction)
+        is EditorComponent -> EditorCard(component, state, onAction, onTitleChange, onBodyChange)
+        else -> Unit
     }
 }
 
 @Composable
-private fun HeroCard(component: JsonObject, state: WorkspaceUiState) {
+private fun HeroCard(component: HeroComponent, state: WorkspaceUiState) {
     Card(
         shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(
@@ -189,17 +230,17 @@ private fun HeroCard(component: JsonObject, state: WorkspaceUiState) {
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Text(
-                text = component.string("eyebrow").resolve(state).uppercase(),
+                text = component.eyebrow.resolve(state).uppercase(),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.secondary,
             )
             Text(
-                text = component.string("title").resolve(state),
+                text = component.title.resolve(state),
                 style = MaterialTheme.typography.headlineMedium,
                 color = MaterialTheme.colorScheme.onSurface,
             )
             Text(
-                text = component.string("body").resolve(state),
+                text = component.body.resolve(state),
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -209,13 +250,12 @@ private fun HeroCard(component: JsonObject, state: WorkspaceUiState) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun StatsRow(component: JsonObject, state: WorkspaceUiState) {
+private fun StatsRow(component: StatsComponent, state: WorkspaceUiState) {
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        component.array("items").forEach { item ->
-            val stat = item.asJsonObject
+        component.items.forEach { stat ->
             Surface(
                 shape = RoundedCornerShape(22.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant,
@@ -226,12 +266,12 @@ private fun StatsRow(component: JsonObject, state: WorkspaceUiState) {
                     verticalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     Text(
-                        text = stat.string("label"),
+                        text = stat.label.resolve(state),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Text(
-                        text = stat.string("value").resolve(state),
+                        text = stat.value.resolve(state),
                         style = MaterialTheme.typography.titleLarge,
                         color = MaterialTheme.colorScheme.onSurface,
                     )
@@ -244,21 +284,20 @@ private fun StatsRow(component: JsonObject, state: WorkspaceUiState) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ActionRow(
-    component: JsonObject,
+    component: ActionsComponent,
     state: WorkspaceUiState,
-    onAction: (String, String?) -> Unit,
+    onAction: (BduiAction, String?) -> Unit,
 ) {
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        component.array("items").forEach { item ->
-            val action = item.asJsonObject
+        component.items.forEach { action ->
             TextButton(
-                onClick = { onAction(action.string("action"), null) },
+                onClick = { onAction(action.action, null) },
             ) {
                 Text(
-                    text = action.string("label").resolve(state),
+                    text = action.label.resolve(state),
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
@@ -268,13 +307,13 @@ private fun ActionRow(
 
 @Composable
 private fun NotesList(
-    component: JsonObject,
+    component: NoteListComponent,
     state: WorkspaceUiState,
-    onAction: (String, String?) -> Unit,
+    onAction: (BduiAction, String?) -> Unit,
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
-            text = component.string("title").resolve(state),
+            text = component.title.resolve(state),
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
         )
@@ -288,11 +327,11 @@ private fun NotesList(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     Text(
-                        text = component.string("empty_title").resolve(state),
+                        text = component.emptyTitle.resolve(state),
                         style = MaterialTheme.typography.titleMedium,
                     )
                     Text(
-                        text = component.string("empty_body").resolve(state),
+                        text = component.emptyBody.resolve(state),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -302,7 +341,7 @@ private fun NotesList(
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 state.notes.forEach { note ->
                     NoteCard(note = note) {
-                        onAction("open_note", note.id)
+                        onAction(component.itemAction, note.id)
                     }
                 }
             }
@@ -353,9 +392,9 @@ private fun NoteCard(
 
 @Composable
 private fun EditorCard(
-    component: JsonObject,
+    component: EditorComponent,
     state: WorkspaceUiState,
-    onAction: (String, String?) -> Unit,
+    onAction: (BduiAction, String?) -> Unit,
     onTitleChange: (String) -> Unit,
     onBodyChange: (String) -> Unit,
 ) {
@@ -368,7 +407,7 @@ private fun EditorCard(
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             Text(
-                text = component.string("title_label"),
+                text = component.titleLabel.resolve(state),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.secondary,
             )
@@ -377,13 +416,13 @@ private fun EditorCard(
                 onValueChange = onTitleChange,
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = {
-                    Text(component.string("title_hint"))
+                    Text(component.titleHint.resolve(state))
                 },
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 shape = RoundedCornerShape(20.dp),
             )
             Text(
-                text = component.string("body_label"),
+                text = component.bodyLabel.resolve(state),
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.secondary,
             )
@@ -394,22 +433,20 @@ private fun EditorCard(
                     .fillMaxWidth()
                     .height(240.dp),
                 placeholder = {
-                    Text(component.string("body_hint"))
+                    Text(component.bodyHint.resolve(state))
                 },
                 keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
                 shape = RoundedCornerShape(20.dp),
             )
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                Button(
-                    onClick = { onAction("save_note", null) },
-                ) {
-                    Text(component.string("save_label"))
-                }
+                ActionButton(action = component.primaryAction, state = state, onAction = onAction)
                 if (state.selectedNoteId != null) {
-                    TextButton(
-                        onClick = { onAction("delete_note", null) },
-                    ) {
-                        Text(component.string("delete_label"))
+                    component.secondaryAction?.let { secondary ->
+                        TextButton(
+                            onClick = { onAction(secondary.action, null) },
+                        ) {
+                            Text(secondary.label.resolve(state))
+                        }
                     }
                 }
             }
@@ -417,12 +454,17 @@ private fun EditorCard(
     }
 }
 
-private fun JsonObject.string(key: String): String {
-    return get(key)?.takeIf { !it.isJsonNull }?.asString.orEmpty()
-}
-
-private fun JsonObject.array(key: String): JsonArray {
-    return getAsJsonArray(key) ?: JsonArray()
+@Composable
+private fun ActionButton(
+    action: ActionItem,
+    state: WorkspaceUiState,
+    onAction: (BduiAction, String?) -> Unit,
+) {
+    Button(
+        onClick = { onAction(action.action, null) },
+    ) {
+        Text(action.label.resolve(state))
+    }
 }
 
 private fun String.resolve(state: WorkspaceUiState): String {

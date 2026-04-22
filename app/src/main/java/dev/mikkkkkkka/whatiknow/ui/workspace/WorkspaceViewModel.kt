@@ -2,13 +2,14 @@ package dev.mikkkkkkka.whatiknow.ui.workspace
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.gson.JsonArray
-import com.google.gson.JsonElement
-import com.google.gson.JsonNull
-import com.google.gson.JsonObject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mikkkkkkka.whatiknow.data.remote.BduiNote
 import dev.mikkkkkkka.whatiknow.data.remote.BduiRepository
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.BduiAction
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.BduiActionKind
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.BduiDestination
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.BduiOperation
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.BduiScreen
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
@@ -28,15 +29,16 @@ data class WorkspaceUiState(
     val route: WorkspaceDestination = WorkspaceDestination.HOME,
     val isLoading: Boolean = true,
     val notes: List<BduiNote> = emptyList(),
-    val homeTemplate: JsonObject = defaultHomeTemplate(),
-    val editorTemplate: JsonObject = defaultEditorTemplate(),
-    val templateSource: String = "embedded",
+    val homeTemplate: BduiScreen? = null,
+    val editorTemplate: BduiScreen? = null,
+    val templateSource: String = "booting",
     val notesSource: String = "cache",
     val syncState: String = "booting",
     val message: String? = null,
     val selectedNoteId: String? = null,
     val draftTitle: String = "",
     val draftBody: String = "",
+    val externalNavigation: BduiDestination? = null,
 )
 
 @HiltViewModel
@@ -51,21 +53,21 @@ class WorkspaceViewModel @Inject constructor(
         refresh()
     }
 
+    fun openNoteFromIntent(noteId: String?) {
+        if (noteId.isNullOrBlank()) {
+            return
+        }
+        openEditor(noteId)
+    }
+
     fun refresh() {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(isLoading = true, syncState = "syncing", message = null)
             }
 
-            repository.seedTemplatesIfMissing(
-                homeTemplate = defaultHomeTemplate(),
-                editorTemplate = defaultEditorTemplate(),
-            )
-
-            val templates = repository.loadTemplates(
-                homeFallback = defaultHomeTemplate(),
-                editorFallback = defaultEditorTemplate(),
-            )
+            repository.seedTemplatesIfMissing()
+            val templates = repository.loadTemplates()
             val noteSnapshot = repository.loadNotes()
 
             _uiState.update { current ->
@@ -88,14 +90,10 @@ class WorkspaceViewModel @Inject constructor(
         }
     }
 
-    fun onAction(action: String, noteId: String? = null) {
-        when (action) {
-            "create_note" -> openEditor(null)
-            "refresh" -> refresh()
-            "back" -> goHome()
-            "save_note" -> saveNote()
-            "delete_note" -> deleteNote()
-            "open_note" -> openEditor(noteId)
+    fun onAction(action: BduiAction, noteId: String? = null) {
+        when (action.kind) {
+            BduiActionKind.NAVIGATE -> handleNavigation(action, noteId)
+            BduiActionKind.COMMAND -> handleCommand(action.operation)
         }
     }
 
@@ -107,6 +105,40 @@ class WorkspaceViewModel @Inject constructor(
         _uiState.update { it.copy(draftBody = value) }
     }
 
+    private fun handleNavigation(action: BduiAction, clickedNoteId: String?) {
+        when (action.destination) {
+            BduiDestination.HOME -> goHome()
+            BduiDestination.EDITOR -> {
+                val resolvedNoteId = resolveNoteIdBinding(action.noteIdBinding, clickedNoteId)
+                openEditor(resolvedNoteId)
+            }
+            BduiDestination.MARK, BduiDestination.AUTH -> {
+                _uiState.update { it.copy(externalNavigation = action.destination) }
+            }
+            BduiDestination.WORKSPACE -> Unit
+
+            null -> Unit
+        }
+    }
+
+    private fun handleCommand(operation: BduiOperation?) {
+        when (operation) {
+            BduiOperation.REFRESH -> refresh()
+            BduiOperation.SAVE_NOTE -> saveNote()
+            BduiOperation.DELETE_NOTE -> deleteNote()
+            else -> Unit
+        }
+    }
+
+    private fun resolveNoteIdBinding(binding: String?, clickedNoteId: String?): String? {
+        return when (binding) {
+            null, "" -> clickedNoteId
+            "{noteId}" -> clickedNoteId
+            "{selectedNoteId}" -> _uiState.value.selectedNoteId
+            else -> binding
+        }
+    }
+
     private fun openEditor(noteId: String?) {
         val note = _uiState.value.notes.firstOrNull { it.id == noteId }
         _uiState.update {
@@ -116,6 +148,7 @@ class WorkspaceViewModel @Inject constructor(
                 draftTitle = note?.title.orEmpty(),
                 draftBody = note?.content.orEmpty(),
                 message = null,
+                externalNavigation = null,
             )
         }
     }
@@ -128,8 +161,13 @@ class WorkspaceViewModel @Inject constructor(
                 draftTitle = "",
                 draftBody = "",
                 message = null,
+                externalNavigation = null,
             )
         }
+    }
+
+    fun onExternalNavigationHandled() {
+        _uiState.update { it.copy(externalNavigation = null) }
     }
 
     private fun saveNote() {
@@ -158,7 +196,7 @@ class WorkspaceViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     route = WorkspaceDestination.HOME,
-                    notes = nextNotes,
+                    notes = result.notes,
                     selectedNoteId = null,
                     draftTitle = "",
                     draftBody = "",
@@ -178,7 +216,7 @@ class WorkspaceViewModel @Inject constructor(
             _uiState.update {
                 it.copy(
                     route = WorkspaceDestination.HOME,
-                    notes = nextNotes,
+                    notes = result.notes,
                     selectedNoteId = null,
                     draftTitle = "",
                     draftBody = "",
@@ -186,101 +224,6 @@ class WorkspaceViewModel @Inject constructor(
                     syncState = if (result.fromRemote) "ready" else "offline",
                     message = result.message ?: "Note deleted",
                 )
-            }
-        }
-    }
-}
-
-private fun defaultHomeTemplate(): JsonObject {
-    return jsonObject(
-        "title" to "Knowledge Cloud",
-        "subtitle" to "Backend-driven home screen",
-        "components" to JsonArray().apply {
-            add(
-                jsonObject(
-                    "type" to "hero",
-                    "eyebrow" to "BDUI",
-                    "title" to "Cloud notes from JSON templates",
-                    "body" to "The screen composition comes from Alfa Echo. The client resolves actions and binds note data locally."
-                )
-            )
-            add(
-                jsonObject(
-                    "type" to "stats",
-                    "items" to JsonArray().apply {
-                        add(jsonObject("label" to "Notes", "value" to "{notesCount}"))
-                        add(jsonObject("label" to "Templates", "value" to "{templateSource}"))
-                        add(jsonObject("label" to "Sync", "value" to "{syncState}"))
-                    }
-                )
-            )
-            add(
-                jsonObject(
-                    "type" to "actions",
-                    "items" to JsonArray().apply {
-                        add(jsonObject("label" to "New note", "action" to "create_note"))
-                        add(jsonObject("label" to "Refresh", "action" to "refresh"))
-                    }
-                )
-            )
-            add(
-                jsonObject(
-                    "type" to "note_list",
-                    "title" to "Saved notes",
-                    "empty_title" to "No notes yet",
-                    "empty_body" to "Create the first note. The collection is stored in Echo API under a device-specific namespace."
-                )
-            )
-        }
-    )
-}
-
-private fun defaultEditorTemplate(): JsonObject {
-    return jsonObject(
-        "title" to "Editor",
-        "subtitle" to "Backend-driven editor screen",
-        "components" to JsonArray().apply {
-            add(
-                jsonObject(
-                    "type" to "hero",
-                    "eyebrow" to "Document",
-                    "title" to "{editorModeTitle}",
-                    "body" to "Fields are native Compose components, but order, copy and actions are delivered through the template."
-                )
-            )
-            add(
-                jsonObject(
-                    "type" to "editor",
-                    "title_label" to "Title",
-                    "title_hint" to "What did you learn today?",
-                    "body_label" to "Body",
-                    "body_hint" to "Capture the note, decision or result.",
-                    "save_label" to "Save to cloud",
-                    "delete_label" to "Delete note"
-                )
-            )
-            add(
-                jsonObject(
-                    "type" to "actions",
-                    "items" to JsonArray().apply {
-                        add(jsonObject("label" to "Back", "action" to "back"))
-                        add(jsonObject("label" to "Refresh template", "action" to "refresh"))
-                    }
-                )
-            )
-        }
-    )
-}
-
-private fun jsonObject(vararg pairs: Pair<String, Any?>): JsonObject {
-    return JsonObject().apply {
-        pairs.forEach { (key, value) ->
-            when (value) {
-                null -> add(key, JsonNull.INSTANCE)
-                is String -> addProperty(key, value)
-                is Number -> addProperty(key, value)
-                is Boolean -> addProperty(key, value)
-                is JsonElement -> add(key, value)
             }
         }
     }

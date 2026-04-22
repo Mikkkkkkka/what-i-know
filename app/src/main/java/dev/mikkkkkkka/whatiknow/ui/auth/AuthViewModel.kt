@@ -1,65 +1,119 @@
 package dev.mikkkkkkka.whatiknow.ui.auth
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.mikkkkkkka.whatiknow.data.remote.BduiRepository
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.BduiAction
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.BduiActionKind
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.BduiOperation
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.BduiScreen
+import dev.mikkkkkkka.whatiknow.data.remote.bdui.EmbeddedBduiTemplates
 import dev.mikkkkkkka.whatiknow.domain.usecase.auth.LoginUseCase
 import dev.mikkkkkkka.whatiknow.domain.usecase.auth.RegisterAndLoginUseCase
-import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+
+data class AuthUiState(
+    val isLoading: Boolean = true,
+    val screen: BduiScreen? = null,
+    val templateSource: String = "booting",
+    val username: String = "",
+    val password: String = "",
+    val errorMessage: String? = null,
+    val completed: Boolean = false,
+)
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
+    private val repository: BduiRepository,
+    private val gson: Gson,
     private val loginUseCase: LoginUseCase,
     private val registerAndLoginUseCase: RegisterAndLoginUseCase,
 ) : ViewModel() {
 
-    private val innerState = MutableLiveData(AuthUiState())
-    val state: LiveData<AuthUiState> = innerState
+    private val _state = MutableStateFlow(AuthUiState())
+    val state: StateFlow<AuthUiState> = _state.asStateFlow()
 
-    private val innerComplete = MutableLiveData(false)
-    val complete: LiveData<Boolean> = innerComplete
+    init {
+        refresh()
+    }
 
-    fun login(username: String, password: String) {
-        submit(username, password) { sanitizedUsername, rawPassword ->
-            loginUseCase(sanitizedUsername, rawPassword)
+    fun refresh() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, errorMessage = null) }
+            repository.seedScreenIfMissing("auth", EmbeddedBduiTemplates.auth(gson))
+            val snapshot = repository.loadScreen("auth", EmbeddedBduiTemplates.auth(gson))
+            _state.update {
+                it.copy(
+                    isLoading = false,
+                    screen = snapshot.screen,
+                    templateSource = snapshot.source,
+                )
+            }
         }
     }
 
-    fun register(username: String, password: String) {
-        submit(username, password) { sanitizedUsername, rawPassword ->
-            registerAndLoginUseCase(sanitizedUsername, rawPassword)
+    fun onUsernameChange(value: String) {
+        _state.update { it.copy(username = value, errorMessage = null) }
+    }
+
+    fun onPasswordChange(value: String) {
+        _state.update { it.copy(password = value, errorMessage = null) }
+    }
+
+    fun onAction(action: BduiAction) {
+        if (action.kind != BduiActionKind.COMMAND) {
+            return
+        }
+        when (action.operation) {
+            BduiOperation.LOGIN -> submit { username, password ->
+                loginUseCase(username, password)
+            }
+
+            BduiOperation.REGISTER -> submit { username, password ->
+                registerAndLoginUseCase(username, password)
+            }
+
+            BduiOperation.REFRESH -> refresh()
+            else -> Unit
         }
     }
 
-    private fun submit(
-        username: String,
-        password: String,
-        action: suspend (String, String) -> Unit,
-    ) {
-        val sanitizedUsername = username.trim()
-        if (sanitizedUsername.isBlank() || password.isBlank()) {
-            innerState.value = AuthUiState(errorMessage = "Username and password are required")
+    private fun submit(action: suspend (String, String) -> Unit) {
+        val snapshot = _state.value
+        val username = snapshot.username.trim()
+        val password = snapshot.password
+        if (username.isBlank() || password.isBlank()) {
+            _state.update { it.copy(errorMessage = "Username and password are required") }
             return
         }
 
-        innerState.value = AuthUiState(isLoading = true)
+        _state.update { it.copy(isLoading = true, errorMessage = null) }
         viewModelScope.launch {
             runCatching {
-                action(sanitizedUsername, password)
+                action(username, password)
             }.onSuccess {
-                innerState.value = AuthUiState()
-                innerComplete.value = true
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = null,
+                        completed = true,
+                    )
+                }
             }.onFailure { throwable ->
-                innerState.value = AuthUiState(errorMessage = throwable.message ?: "Authentication failed")
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = throwable.message ?: "Authentication failed",
+                    )
+                }
             }
         }
     }
 }
-
-data class AuthUiState(
-    val isLoading: Boolean = false,
-    val errorMessage: String? = null,
-)
