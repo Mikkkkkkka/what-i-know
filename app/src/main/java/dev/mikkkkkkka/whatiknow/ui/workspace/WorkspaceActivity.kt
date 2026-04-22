@@ -12,20 +12,25 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import dev.mikkkkkkka.whatiknow.BuildConfig
 import dev.mikkkkkkka.whatiknow.databinding.ActivityWorkspaceBinding
 import dev.mikkkkkkka.whatiknow.domain.usecase.auth.IsSignedInUseCase
+import dev.mikkkkkkka.whatiknow.domain.usecase.auth.LogoutUseCase
 import dev.mikkkkkkka.whatiknow.domain.usecase.mark.SyncMarksUseCase
 import dev.mikkkkkkka.whatiknow.domain.usecase.note.SyncNotesUseCase
 import dev.mikkkkkkka.whatiknow.ui.auth.AuthActivity
 import dev.mikkkkkkka.whatiknow.ui.mark.MarkActivity
 import dev.mikkkkkkka.whatiknow.ui.note.NoteFragment
+import java.io.IOException
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class WorkspaceActivity : AppCompatActivity(), WorkspaceFragment.Callbacks {
 
     @Inject lateinit var isSignedInUseCase: IsSignedInUseCase
+    @Inject lateinit var logoutUseCase: LogoutUseCase
     @Inject lateinit var syncNotesUseCase: SyncNotesUseCase
     @Inject lateinit var syncMarksUseCase: SyncMarksUseCase
 
@@ -157,15 +162,35 @@ class WorkspaceActivity : AppCompatActivity(), WorkspaceFragment.Callbacks {
 
     private fun runSync(showSuccessToast: Boolean = false) {
         lifecycleScope.launch {
-            val success = runCatching {
+            val failure = runCatching {
                 syncNotesUseCase()
                 syncMarksUseCase()
-            }.isSuccess
+            }.exceptionOrNull()
+
+            if (failure is HttpException && failure.code() == 401) {
+                logoutUseCase()
+                Toast.makeText(
+                    this@WorkspaceActivity,
+                    "Session expired, sign in again",
+                    Toast.LENGTH_SHORT
+                ).show()
+                authLauncher.launch(AuthActivity.createIntent(this@WorkspaceActivity))
+                return@launch
+            }
 
             if (showSuccessToast) {
-                val message = if (success) "Sync finished" else "Sync failed, local changes kept"
+                val message = syncResultMessage(failure)
                 Toast.makeText(this@WorkspaceActivity, message, Toast.LENGTH_SHORT).show()
             }
+        }
+    }
+
+    private fun syncResultMessage(failure: Throwable?): String {
+        return when (failure) {
+            null -> "Sync finished"
+            is HttpException -> "Sync failed (${failure.code()}), local changes kept"
+            is IOException -> "Sync failed: can't reach ${BuildConfig.API_BASE_URL}"
+            else -> "Sync failed, local changes kept"
         }
     }
 
