@@ -23,6 +23,7 @@ data class BduiNote(
 data class TemplateSnapshot(
     val home: BduiScreen,
     val editor: BduiScreen,
+    val mark: BduiScreen,
     val source: String,
 )
 
@@ -48,16 +49,19 @@ class BduiRepository @Inject constructor(
     suspend fun seedTemplatesIfMissing() {
         seedTemplateIfMissing("home", EmbeddedBduiTemplates.home(gson))
         seedTemplateIfMissing("editor", EmbeddedBduiTemplates.editor(gson))
+        seedTemplateIfMissing("mark", EmbeddedBduiTemplates.mark(gson))
     }
 
     suspend fun loadTemplates(): TemplateSnapshot {
         val home = loadScreen("home", EmbeddedBduiTemplates.home(gson))
         val editor = loadScreen("editor", EmbeddedBduiTemplates.editor(gson))
+        val mark = loadScreen("mark", EmbeddedBduiTemplates.mark(gson))
         val fromRemote = home.source == "cloud" && editor.source == "cloud"
 
         return TemplateSnapshot(
             home = home.screen,
             editor = editor.screen,
+            mark = mark.screen,
             source = if (fromRemote) "cloud" else "embedded",
         )
     }
