@@ -2,7 +2,6 @@ package dev.mikkkkkkka.whatiknow.ui.mark
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
@@ -13,6 +12,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.YearMonth
 import kotlin.math.max
+import androidx.core.graphics.toColorInt
 
 class CalendarHeatmapView @JvmOverloads constructor(
     context: Context,
@@ -33,15 +33,15 @@ class CalendarHeatmapView @JvmOverloads constructor(
     private val cornerRadius = dp(8f)
     private val strokeWidth = dp(2f)
 
-    private val emptyColor = Color.parseColor("#EBEDF0")
-    private val levelOneColor = Color.parseColor("#C6E48B")
-    private val levelTwoColor = Color.parseColor("#7BC96F")
-    private val levelThreeColor = Color.parseColor("#239A3B")
-    private val levelFourColor = Color.parseColor("#196127")
-    private val todayStrokeColor = Color.parseColor("#1F2937")
-    private val selectedStrokeColor = Color.parseColor("#2563EB")
-    private val labelTextColor = Color.parseColor("#6B7280")
-    private val dayNumberColor = Color.parseColor("#111827")
+    private val emptyColor = "#EBEDF0".toColorInt()
+    private val levelOneColor = "#C6E48B".toColorInt()
+    private val levelTwoColor = "#7BC96F".toColorInt()
+    private val levelThreeColor = "#239A3B".toColorInt()
+    private val levelFourColor = "#196127".toColorInt()
+    private val todayStrokeColor = "#1F2937".toColorInt()
+    private val selectedStrokeColor = "#2563EB".toColorInt()
+    private val labelTextColor = "#6B7280".toColorInt()
+    private val dayNumberColor = "#111827".toColorInt()
 
     private val fillPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
@@ -135,6 +135,11 @@ class CalendarHeatmapView @JvmOverloads constructor(
         }
     }
 
+    override fun performClick(): Boolean {
+        super.performClick()
+        return true
+    }
+
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (event.action == MotionEvent.ACTION_UP) {
             val selected = dayBounds.entries.firstOrNull { it.value.contains(event.x, event.y) }?.key
@@ -147,10 +152,6 @@ class CalendarHeatmapView @JvmOverloads constructor(
             }
         }
         return true
-    }
-
-    override fun performClick(): Boolean {
-        return super.performClick()
     }
 
     private fun drawWeekdayLabels(canvas: Canvas, startX: Float, baseline: Float, cellSize: Float) {
