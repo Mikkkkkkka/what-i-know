@@ -24,7 +24,8 @@ class CalendarHeatmapView @JvmOverloads constructor(
     private var visibleMonth: YearMonth = YearMonth.now()
     private var selectedDate: LocalDate? = null
     private var activityCounts: Map<LocalDate, Int> = emptyMap()
-    private val dayBounds = mutableMapOf<LocalDate, RectF>()
+    private val dayCells = mutableListOf<DayCell>()
+    private var dayCellsDirty = true
 
     private val gridGap = dp(6f)
     private val dayLabelHeight = dp(16f)
@@ -64,6 +65,7 @@ class CalendarHeatmapView @JvmOverloads constructor(
     fun setMonth(month: YearMonth) {
         if (visibleMonth == month) return
         visibleMonth = month
+        dayCellsDirty = true
         invalidate()
     }
 
@@ -73,8 +75,12 @@ class CalendarHeatmapView @JvmOverloads constructor(
     }
 
     fun setSelectedDate(date: LocalDate?) {
+        val previousMonth = visibleMonth
         selectedDate = date
         date?.let { visibleMonth = YearMonth.from(it) }
+        if (previousMonth != visibleMonth) {
+            dayCellsDirty = true
+        }
         invalidate()
     }
 
@@ -90,15 +96,79 @@ class CalendarHeatmapView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        dayBounds.clear()
+        ensureDayCells()
 
         val contentWidth = (width - paddingLeft - paddingRight).toFloat().coerceAtLeast(0f)
         val cellSize = calculateCellSize(contentWidth)
         val startX = paddingLeft.toFloat()
         val labelBaseline = paddingTop + topSpacing - labelPaint.fontMetrics.ascent
-        val gridTop = paddingTop + topSpacing + dayLabelHeight + gridGap
 
         drawWeekdayLabels(canvas, startX, labelBaseline, cellSize)
+
+        for (cell in dayCells) {
+            val date = cell.date
+            val rect = cell.bounds
+            fillPaint.color = colorForCount(activityCounts[date] ?: 0)
+            canvas.drawRoundRect(rect, cornerRadius, cornerRadius, fillPaint)
+
+            if (cell.isToday) {
+                strokePaint.color = todayStrokeColor
+                canvas.drawRoundRect(rect, cornerRadius, cornerRadius, strokePaint)
+            }
+
+            if (date == selectedDate) {
+                strokePaint.color = selectedStrokeColor
+                canvas.drawRoundRect(rect, cornerRadius, cornerRadius, strokePaint)
+            }
+
+            val textX = rect.centerX()
+            val textY = rect.centerY() - (dayNumberPaint.fontMetrics.ascent + dayNumberPaint.fontMetrics.descent) / 2f
+            canvas.drawText(cell.dayLabel, textX, textY, dayNumberPaint)
+        }
+    }
+
+    override fun performClick(): Boolean {
+        super.performClick()
+        return true
+    }
+
+    override fun onTouchEvent(event: MotionEvent): Boolean {
+        if (event.action == MotionEvent.ACTION_UP) {
+            val selected = dayCells.firstOrNull { it.bounds.contains(event.x, event.y) }?.date
+            if (selected != null) {
+                selectedDate = selected
+                invalidate()
+                onDateClick?.invoke(selected)
+                performClick()
+                return true
+            }
+        }
+        return true
+    }
+
+    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+        super.onSizeChanged(w, h, oldw, oldh)
+        if (w != oldw || h != oldh) {
+            dayCellsDirty = true
+        }
+    }
+
+    private fun drawWeekdayLabels(canvas: Canvas, startX: Float, baseline: Float, cellSize: Float) {
+        WEEKDAY_LABELS.forEachIndexed { index, label ->
+            val x = startX + index * (cellSize + gridGap) + cellSize / 2f
+            canvas.drawText(label, x, baseline, labelPaint)
+        }
+    }
+
+    private fun ensureDayCells() {
+        if (!dayCellsDirty) return
+
+        dayCells.clear()
+
+        val contentWidth = (width - paddingLeft - paddingRight).toFloat().coerceAtLeast(0f)
+        val cellSize = calculateCellSize(contentWidth)
+        val startX = paddingLeft.toFloat()
+        val gridTop = paddingTop + topSpacing + dayLabelHeight + gridGap
 
         val firstDayOfMonth = visibleMonth.atDay(1)
         val daysInMonth = visibleMonth.lengthOfMonth()
@@ -113,52 +183,15 @@ class CalendarHeatmapView @JvmOverloads constructor(
 
             val left = startX + column * (cellSize + gridGap)
             val top = gridTop + row * (cellSize + gridGap)
-            val rect = RectF(left, top, left + cellSize, top + cellSize)
-            dayBounds[date] = rect
-
-            fillPaint.color = colorForCount(activityCounts[date] ?: 0)
-            canvas.drawRoundRect(rect, cornerRadius, cornerRadius, fillPaint)
-
-            if (date == today) {
-                strokePaint.color = todayStrokeColor
-                canvas.drawRoundRect(rect, cornerRadius, cornerRadius, strokePaint)
-            }
-
-            if (date == selectedDate) {
-                strokePaint.color = selectedStrokeColor
-                canvas.drawRoundRect(rect, cornerRadius, cornerRadius, strokePaint)
-            }
-
-            val textX = rect.centerX()
-            val textY = rect.centerY() - (dayNumberPaint.fontMetrics.ascent + dayNumberPaint.fontMetrics.descent) / 2f
-            canvas.drawText(day.toString(), textX, textY, dayNumberPaint)
+            dayCells += DayCell(
+                date = date,
+                bounds = RectF(left, top, left + cellSize, top + cellSize),
+                dayLabel = day.toString(),
+                isToday = date == today,
+            )
         }
-    }
 
-    override fun performClick(): Boolean {
-        super.performClick()
-        return true
-    }
-
-    override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (event.action == MotionEvent.ACTION_UP) {
-            val selected = dayBounds.entries.firstOrNull { it.value.contains(event.x, event.y) }?.key
-            if (selected != null) {
-                selectedDate = selected
-                invalidate()
-                onDateClick?.invoke(selected)
-                performClick()
-                return true
-            }
-        }
-        return true
-    }
-
-    private fun drawWeekdayLabels(canvas: Canvas, startX: Float, baseline: Float, cellSize: Float) {
-        WEEKDAY_LABELS.forEachIndexed { index, label ->
-            val x = startX + index * (cellSize + gridGap) + cellSize / 2f
-            canvas.drawText(label, x, baseline, labelPaint)
-        }
+        dayCellsDirty = false
     }
 
     private fun calculateCellSize(contentWidth: Float): Float {
@@ -197,4 +230,11 @@ class CalendarHeatmapView @JvmOverloads constructor(
     companion object {
         private val WEEKDAY_LABELS = listOf("Mo", "Tu", "We", "Th", "Fr", "Sa", "Su")
     }
+
+    private data class DayCell(
+        val date: LocalDate,
+        val bounds: RectF,
+        val dayLabel: String,
+        val isToday: Boolean,
+    )
 }
